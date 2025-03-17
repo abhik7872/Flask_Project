@@ -3,13 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, create_access_token
 from model import db, User
-import config
 
 app = Flask(__name__)
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = config.DATABASE_URL
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://abhikchatterjee:ABHIK@localhost/dummy_db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = config.JWT_SECRET_KEY
+app.config['JWT_SECRET_KEY'] = "myjwtsecret"
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -25,6 +24,7 @@ def register():
     data = request.get_json()
     if User.query.filter_by(username=data['username']).first():
         return jsonify({"error": "User already exists"}), 400
+    
     user = User(username=data['username'], password=data['password'])
     db.session.add(user)
     db.session.commit()
@@ -36,7 +36,7 @@ def login():
     user = User.query.filter_by(username=data['username'], password=data['password']).first()
     if not user:
         return jsonify({"error": "Invalid credentials"}), 401
-    token = create_access_token(identity=user.id)
+    token = create_access_token(identity=str(user.id))
     return jsonify({"access_token": token})
 
 if __name__ == '__main__':

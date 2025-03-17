@@ -1,8 +1,8 @@
-"""Create User table
+"""Fixing missing revision
 
-Revision ID: d16cdb114be2
+Revision ID: 4c215405d3be
 Revises: 
-Create Date: 2025-03-15 02:39:54.610949
+Create Date: 2025-03-16 23:20:29.642638
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd16cdb114be2'
+revision = '4c215405d3be'
 down_revision = None
 branch_labels = None
 depends_on = None
