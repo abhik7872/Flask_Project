@@ -40,11 +40,11 @@ def create_todo():
 @jwt_required()
 def update_todo(id):
     user_id = get_jwt_identity()
+    todo = ToDO.query.get(id)
     
     print(f"🔹 User ID from token: {user_id}")  # Debugging
     print(f"🔹 Task ID: {id}, Owner: {todo.user_id if todo else 'Not Found'}") 
 
-    todo = ToDO.query.get(id)
     if not todo:
         return jsonify({"error": "Task not found"}), 404
 
