@@ -67,10 +67,10 @@ def todo_page():
 
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {token}"  # ✅ Ensure token is included
+        "Authorization": f"Bearer {token}"
     }
 
-    print("Request Headers being sent:", headers)  # Debugging
+    print("Request Headers being sent:", headers)
 
     if request.method == 'GET':
         response = requests.get(f"{TODO_MICROSERVICE}/todo", headers=headers)
@@ -90,7 +90,7 @@ def todo_page():
         return jsonify({"error": "Failed to create task"}), 400
 
 
-@app.route('/todo/<int:id>', methods=['PUT', 'DELETE'])
+@app.route('/todo/update/<int:id>', methods=['POST'])
 def alter_data(id):
     token = session.get('token')
     if not token:
@@ -100,20 +100,26 @@ def alter_data(id):
         "Authorization": f"Bearer {token}"
     }
 
-    if request.method == 'PUT':
-        data = request.json
-        response = requests.put(f"{TODO_MICROSERVICE}/todo/{id}", json=data, headers=headers)
-        if response.status_code in [200, 204]:
-            return jsonify({"message": "Success"}), response.status_code
-        return jsonify({"error": "Failed to process request"}), response.status_code
+    data = request.json
+    response = requests.post(f"{TODO_MICROSERVICE}/todo/update{id}", json=data, headers=headers)
+    if response.status_code in [200, 204]:
+        return jsonify({"message": "Success"}), response.status_code
+    return jsonify({"error": "Failed to process request"}), response.status_code
+
+@app.route('/todo/delete/<int:id>', methods=['POST'])
+def delete_data(id):
+    token = session.get('token')
+    if not token:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
     
-    elif request.method == 'DELETE':
-        response = requests.delete(f"{TODO_MICROSERVICE}/todo/{id}", headers=headers)
-        if response.status_code in [200, 204]:
-            return jsonify({"message": "Success"}), response.status_code
-        return jsonify({"error": "Failed to process request"}), response.status_code
-
-
+    response = requests.post(f"{TODO_MICROSERVICE}/todo/delete/{id}", headers=headers)
+    if response.status_code in [200, 204]:
+        return jsonify({"message": "Success"}), response.status_code
+    return jsonify({"error": "Failed to process request"}), response.status_code
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

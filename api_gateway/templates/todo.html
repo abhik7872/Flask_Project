@@ -11,21 +11,21 @@
             <th>Task</th>
             <th>Description</th>
             <th>Actions</th>
+            <th>Status</th>
         </tr>
         {% for task in tasks %}
             <tr>
                 <td>{{ task.task }}</td>
                 <td>{{ task.description }}</td>
                 <td>
-                    <form action="/todo/{{ task.id }}" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
+                    <form action="/todo/update/{{ task.id }}" method="POST">
                         <button type="submit">Update</button>
                     </form>
-                    <form action="/todo/{{ task.id }}" method="POST" style="display:inline;">
-                        <input type="hidden" name="_method" value="DELETE">
+                    <form action="/todo/delete/{{ task.id }}" method="POST" style="display:inline;">
                         <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
                     </form>
                 </td>
+                <td>{{ 'Completed' if todo.isCompleted else 'Pending' }}</td>
             </tr>
         {% endfor %}
     </table>
