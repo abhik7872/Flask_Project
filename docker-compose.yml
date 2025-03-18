@@ -21,7 +21,7 @@ services:
     environment:
       DATABASE_URL: postgresql://abhikchatterjee:ABHIK@postgres:5432/dummy_db
     ports:
-      - "5001:8001"
+      - "5001:5001"
 
   todo-service:
     build: ./todo_service
@@ -32,7 +32,7 @@ services:
     environment:
       DATABASE_URL: postgresql://abhikchatterjee:ABHIK@postgres:5432/dummy_db
     ports:
-      - "5002:8002"
+      - "5002:5002"
 
   frontend-gateway:
     build: ./api_gateway
@@ -42,7 +42,7 @@ services:
       - login-service
       - todo-service
     ports:
-      - "5050:8000"
+      - "5050:5050"
 
 volumes:
   postgres_data:
