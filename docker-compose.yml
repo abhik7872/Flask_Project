@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: dummy_db_container
+    restart: always
+    environment:
+      POSTGRES_USER: abhikchatterjee
+      POSTGRES_PASSWORD: ABHIK
+      POSTGRES_DB: dummy_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  login-service:
+    build: ./login_service
+    container_name: login_service
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://abhikchatterjee:ABHIK@postgres:5432/dummy_db
+    ports:
+      - "8001:8001"
+
+  todo-service:
+    build: ./todo_service
+    container_name: todo_service
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://abhikchatterjee:ABHIK@postgres:5432/dummy_db
+    ports:
+      - "8002:8002"
+
+  frontend-gateway:
+    build: ./api_gateway
+    container_name: api_gateway
+    restart: always
+    depends_on:
+      - login-service
+      - todo-service
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:

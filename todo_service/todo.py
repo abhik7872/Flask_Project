@@ -30,7 +30,7 @@ def create_todo():
     user_id = get_jwt_identity()
     data = request.json
 
-    new_todo = ToDO(task=data["task"], description=data.get("description", ""), user_id=user_id)
+    new_todo = ToDO(task=data["task"], description=data.get("description", ""), isCompleted=data.get("isCompleted", False), user_id=user_id)
     db.session.add(new_todo)
     db.session.commit()
 
@@ -39,11 +39,11 @@ def create_todo():
 @app.route("/todo/update/<int:id>", methods=["POST"], endpoint="update_todo")
 @jwt_required()
 def update_todo(id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     todo = ToDO.query.get(id)
     
-    print(f"🔹 User ID from token: {user_id}")
-    print(f"🔹 Task ID: {id}, Owner: {todo.user_id if todo else 'Not Found'}") 
+    print(f"User ID from token: {user_id}")
+    print(f"Task ID: {id}, Owner: {todo.user_id if todo else 'Not Found'}") 
 
     if not todo:
         return jsonify({"error": "Task not found"}), 404
@@ -55,7 +55,6 @@ def update_todo(id):
     if not data:
         return jsonify({"error": "Invalid JSON data"}), 400
     
-    method = request.form.get("_method")
 
     todo.task = data.get("task", todo.task)
     todo.description = data.get("description", todo.description)
@@ -66,11 +65,12 @@ def update_todo(id):
 @app.route("/todo/delete/<int:id>", methods=["POST"], endpoint="delete_todo")
 @jwt_required()
 def delete_todo(id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     todo = ToDO.query.get(id)
     
-    print(f"🔹 User ID from token: {user_id}")
-    print(f"🔹 Task ID: {id}, Owner: {todo.user_id if todo else 'Not Found'}") 
+    print(f"User ID from token: {user_id}")
+    print(type(user_id), type(id), type(todo.user_id))
+    print(f"Task ID: {id}, Owner: {todo.user_id if todo else 'Not Found'}") 
 
     if not todo:
         return jsonify({"error": "Task not found"}), 404
@@ -78,11 +78,11 @@ def delete_todo(id):
     if todo.user_id != user_id:
         return jsonify({"error": "Unauthorized"}), 403
 
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Invalid JSON data"}), 400
+    # data = request.get_json()
+    # if not data:
+    #     return jsonify({"error": "Invalid JSON data"}), 400
     
-    method = request.form.get("_method")
+    # method = request.form.get("_method")
     
     db.session.delete(todo)
     db.session.commit()

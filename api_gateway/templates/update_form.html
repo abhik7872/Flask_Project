@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="/todo/update/{{ task.id }}" method="POST">
+        <input type="text" name="task" value="{{ task.task }}">
+        <input type="text" name="description" value="{{ task.description }}">
+        
+        <select name="isCompleted">
+            <option value="false" {% if not task.isCompleted %}selected{% endif %}>Pending</option>
+            <option value="true" {% if task.isCompleted %}selected{% endif %}>Completed</option>
+        </select>
+
+        <button type="submit">Update</button>
+    </form>
+{% endblock %}

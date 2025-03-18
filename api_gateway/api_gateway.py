@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify, flash
 import requests
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 
@@ -38,9 +38,9 @@ def login():
 
         if response.status_code == 200:
             json_response = response.json()
-            session["token"] = json_response.get("access_token", "")  # ✅ Fix key name
+            session["token"] = json_response.get("access_token", "")
 
-            print("Stored Token:", session.get("token"))  # Debugging
+            print("Stored Token:", session.get("token"))
 
             return redirect(next_url)
 
@@ -82,7 +82,8 @@ def todo_page():
     elif request.method == 'POST':
         data = {
             "task": request.form["task"],
-            "description": request.form.get("description", "")
+            "description": request.form.get("description", ""),
+            "isCompleted": request.form.get("isCompleted") is not None
         }
         response = requests.post(f"{TODO_MICROSERVICE}/todo", json=data, headers=headers)
         if response.status_code == 201:
@@ -97,14 +98,27 @@ def alter_data(id):
         return jsonify({"error": "Unauthorized"}), 401
 
     headers = {
+        "Content-Type": "application/json",
         "Authorization": f"Bearer {token}"
     }
 
-    data = request.json
-    response = requests.post(f"{TODO_MICROSERVICE}/todo/update{id}", json=data, headers=headers)
+    print(token)
+
+    data = {
+            "task": request.form["task"],
+            "description": request.form.get("description", ""),
+            "isCompleted": request.form.get("isCompleted") is not None
+        }
+    response = requests.post(f"{TODO_MICROSERVICE}/todo/update/{id}", json=data, headers=headers)
+
+    print(response.status_code)
+    print(response.text)
+
     if response.status_code in [200, 204]:
-        return jsonify({"message": "Success"}), response.status_code
+        flash("Task updated successfully", "success")
+        return redirect(url_for("todo_page"))
     return jsonify({"error": "Failed to process request"}), response.status_code
+
 
 @app.route('/todo/delete/<int:id>', methods=['POST'])
 def delete_data(id):
@@ -113,13 +127,22 @@ def delete_data(id):
         return jsonify({"error": "Unauthorized"}), 401
 
     headers = {
+        "Content-Type": "application/json",
         "Authorization": f"Bearer {token}"
     }
     
     response = requests.post(f"{TODO_MICROSERVICE}/todo/delete/{id}", headers=headers)
+    print(headers)
+    print(f"esponse Status: {response.status_code}, Response Data: {response.text}")
     if response.status_code in [200, 204]:
-        return jsonify({"message": "Success"}), response.status_code
-    return jsonify({"error": "Failed to process request"}), response.status_code
+        flash("Task deleted successfully", "success")
+        return redirect(url_for("todo_page"))
+    return jsonify({"error": "Failed to delete task"}), 400
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

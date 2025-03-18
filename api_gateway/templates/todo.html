@@ -17,15 +17,23 @@
             <tr>
                 <td>{{ task.task }}</td>
                 <td>{{ task.description }}</td>
+                <td>{{ 'Completed' if task.isCompleted else 'Pending' }}</td>
                 <td>
                     <form action="/todo/update/{{ task.id }}" method="POST">
+                        <input type="text" name="task" value="{{ task.task }}">
+                        <input type="text" name="description" value="{{ task.description }}">
+                        
+                        <select name="isCompleted">
+                            <option value="false" {% if not task.isCompleted %}selected{% endif %}>Pending</option>
+                            <option value="true" {% if task.isCompleted %}selected{% endif %}>Completed</option>
+                        </select>
+                
                         <button type="submit">Update</button>
                     </form>
                     <form action="/todo/delete/{{ task.id }}" method="POST" style="display:inline;">
                         <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
                     </form>
                 </td>
-                <td>{{ 'Completed' if todo.isCompleted else 'Pending' }}</td>
             </tr>
         {% endfor %}
     </table>
@@ -35,6 +43,10 @@
         <form action="/todo" method="POST">
             <input type="text" name="task" id="task" placeholder="task">
             <input type="text" name="description" id="description" placeholder="description">
+            <select name="isCompleted" id="isCompleted">
+                <option value="false" selected>Pending</option>
+                <option value="true">Completed</option>
+            </select>
             <input type="submit" value="Add Task">
         </form>
     </div>
