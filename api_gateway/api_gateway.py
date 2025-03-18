@@ -83,7 +83,7 @@ def todo_page():
         data = {
             "task": request.form["task"],
             "description": request.form.get("description", ""),
-            "isCompleted": request.form.get("isCompleted") is not None
+            "isCompleted": request.form.get("isCompleted", "").lower() in ["true", "on", "1", True]
         }
         response = requests.post(f"{TODO_MICROSERVICE}/todo", json=data, headers=headers)
         if response.status_code == 201:
@@ -105,16 +105,17 @@ def alter_data(id):
     print(token)
 
     if request.method == 'GET':
+        response = requests.get(f"{TODO_MICROSERVICE}/todo/update/{id}", headers=headers)
         if response.status_code != 200:
             return jsonify({"error": "Failed to load tasks"}), response.status_code
-        tasks = response.json()
-        return render_template('update_todo.html', tasks=tasks)
+        task = response.json()
+        return render_template('update_form.html', task=task)
 
     elif request.method == 'POST':
         data = {
                 "task": request.form["task"],
                 "description": request.form.get("description", ""),
-                "isCompleted": request.form.get("isCompleted") is not None
+                "isCompleted": request.form.get("isCompleted").lower() in ["true", "on", "1", True]
             }
         response = requests.post(f"{TODO_MICROSERVICE}/todo/update/{id}", json=data, headers=headers)
 

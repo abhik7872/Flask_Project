@@ -36,7 +36,7 @@ def create_todo():
 
     return jsonify({"message": "Task created successfully!"}), 201
 
-@app.route("/todo/update/<int:id>", methods=["POST"], endpoint="update_todo")
+@app.route("/todo/update/<int:id>", methods=["GET", "POST"], endpoint="update_todo")
 @jwt_required()
 def update_todo(id):
     user_id = int(get_jwt_identity())
@@ -51,17 +51,26 @@ def update_todo(id):
     if todo.user_id != user_id:
         return jsonify({"error": "Unauthorized"}), 403
 
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Invalid JSON data"}), 400
+    if request.method == 'GET':
+        print(f"Task details: ID={todo.id}, Task={todo.task}, Description={todo.description}, Completed={todo.isCompleted}")
+        return jsonify({
+            "id": todo.id,
+            "task": todo.task,
+            "description": todo.description,
+            "isCompleted": todo.isCompleted
+        })
+
+    elif request.method == "POST":
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON data"}), 400
+        todo.task = data.get("task", todo.task)
+        todo.description = data.get("description", todo.description)
+        todo.isCompleted = str(data.get("isCompleted", todo.isCompleted)).lower() in ["true", "on", "1", True]
+        db.session.commit()
+        return jsonify({"message": "Task updated successfully!"})
     
 
-    todo.task = data.get("task", todo.task)
-    todo.description = data.get("description", todo.description)
-    todo.isCompleted = data.get("isCompleted", todo.isCompleted)
-    db.session.commit()
-    return jsonify({"message": "Task updated successfully!"})
-    
 @app.route("/todo/delete/<int:id>", methods=["POST"], endpoint="delete_todo")
 @jwt_required()
 def delete_todo(id):

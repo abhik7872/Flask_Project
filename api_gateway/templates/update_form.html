@@ -1,17 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% for task in tasks %}
-        <form action="/todo/update/{{ task.id }}" method="POST">
-            <input type="text" name="task" value="{{ task.task }}">
-            <input type="text" name="description" value="{{ task.description }}">
-            
-            <select name="isCompleted">
-                <option value="false" {% if not task.isCompleted %}selected{% endif %}>Pending</option>
-                <option value="true" {% if task.isCompleted %}selected{% endif %}>Completed</option>
-            </select>
+    <h2>Update Task</h2>
+    <form action="/todo/update/{{ task.id }}" method="POST">
+        <label for="task">Task:</label>
+        <input type="text" id="task" name="task" value="{{ task.task }}" required>
 
-            <button type="submit">Update</button>
-        </form>
-    {% endfor %}
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" value="{{ task.description }}" required>
+
+        <label for="isCompleted">Status:</label>
+        <select id="isCompleted" name="isCompleted">
+            <option value="false" {% if not task.isCompleted %}selected{% endif %}>Pending</option>
+            <option value="true" {% if task.isCompleted %}selected{% endif %}>Completed</option>
+        </select>
+
+        <button type="submit">Update</button>
+    </form>
 {% endblock %}
