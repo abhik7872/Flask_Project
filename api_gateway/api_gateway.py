@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify, flash
 import requests
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager
 
 
 LOGIN_MICROSERVICE = 'http://127.0.0.1:5001'
@@ -91,7 +91,7 @@ def todo_page():
         return jsonify({"error": "Failed to create task"}), 400
 
 
-@app.route('/todo/update/<int:id>', methods=['POST'])
+@app.route('/todo/update/<int:id>', methods=['GET', 'POST'])
 def alter_data(id):
     token = session.get('token')
     if not token:
@@ -104,20 +104,27 @@ def alter_data(id):
 
     print(token)
 
-    data = {
-            "task": request.form["task"],
-            "description": request.form.get("description", ""),
-            "isCompleted": request.form.get("isCompleted") is not None
-        }
-    response = requests.post(f"{TODO_MICROSERVICE}/todo/update/{id}", json=data, headers=headers)
+    if request.method == 'GET':
+        if response.status_code != 200:
+            return jsonify({"error": "Failed to load tasks"}), response.status_code
+        tasks = response.json()
+        return render_template('update_todo.html', tasks=tasks)
 
-    print(response.status_code)
-    print(response.text)
+    elif request.method == 'POST':
+        data = {
+                "task": request.form["task"],
+                "description": request.form.get("description", ""),
+                "isCompleted": request.form.get("isCompleted") is not None
+            }
+        response = requests.post(f"{TODO_MICROSERVICE}/todo/update/{id}", json=data, headers=headers)
 
-    if response.status_code in [200, 204]:
-        flash("Task updated successfully", "success")
-        return redirect(url_for("todo_page"))
-    return jsonify({"error": "Failed to process request"}), response.status_code
+        print(response.status_code)
+        print(response.text)
+
+        if response.status_code in [200, 204]:
+            flash("Task updated successfully", "success")
+            return redirect(url_for("todo_page"))
+        return jsonify({"error": "Failed to process request"}), response.status_code
 
 
 @app.route('/todo/delete/<int:id>', methods=['POST'])
