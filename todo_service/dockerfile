@@ -3,5 +3,6 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
+ENV TODO_MICROSERVICE=http://todo_service:5001
 EXPOSE 5002
 CMD ["python", "todo.py"]
