@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   postgres:
@@ -17,6 +17,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U abhikchatterjee -d dummy_db"]
       interval: 5s
       retries: 5
+    networks:
+      - my_network
 
   login-service:
     build: ./login_service
@@ -26,9 +28,12 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://abhikchatterjee:ABHIK@postgres:5432/dummy_db
+      DATABASE: postgresql://abhikchatterjee:ABHIK@postgres:5432/dummy_db
+      LOGIN_MICROSERVICE: http://login-service:5001
     ports:
       - "5001:5001"
+    networks:
+      - my_network
 
   todo-service:
     build: ./todo_service
@@ -38,9 +43,12 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://abhikchatterjee:ABHIK@postgres:5432/dummy_db
+      DATABASE: postgresql://abhikchatterjee:ABHIK@postgres:5432/dummy_db
+      TODO_MICROSERVICE: http://todo-service:5002
     ports:
       - "5002:5002"
+    networks:
+      - my_network
 
   frontend-gateway:
     build: ./api_gateway
@@ -53,6 +61,12 @@ services:
         condition: service_started
     ports:
       - "5050:5050"
+    networks:
+      - my_network
 
 volumes:
   postgres_data:
+
+networks:
+  my_network:
+    driver: bridge

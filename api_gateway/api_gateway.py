@@ -1,10 +1,11 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify, flash
 import requests
+import os
 from flask_jwt_extended import JWTManager
 
 
-LOGIN_MICROSERVICE = 'http://127.0.0.1:5001'
-TODO_MICROSERVICE = 'http://127.0.0.1:5002'
+LOGIN_MICROSERVICE = os.getenv("LOGIN_MICROSERVICE", "http://login_service:5001")
+TODO_MICROSERVICE = os.getenv("TODO_MICROSERVICE", "http://todo-service:5002")
 
 app = Flask(__name__)
 app.secret_key = "myjwtsecret"

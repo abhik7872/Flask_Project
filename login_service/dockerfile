@@ -3,6 +3,6 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-ENV LOGIN_MICROSERVICE=http://login_service:5001
+ENV FLASK_APP=login.py
 EXPOSE 5001
-CMD ["python", "login.py"]
+CMD ["sh", "-c", "flask db upgrade && python login.py"]

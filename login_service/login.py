@@ -3,16 +3,20 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, create_access_token
 from model import db, User
+import os
 
 app = Flask(__name__)
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://abhikchatterjee:ABHIK@localhost/dummy_db"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE", "postgresql://abhikchatterjee:ABHIK@localhost/dummy_db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = "myjwtsecret"
 
 db.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
+
+@app.route('/', methods=["GET"])
+def test():
+    return "Testing"
 
 @app.route('/users', methods=['GET'])
 def userList():
