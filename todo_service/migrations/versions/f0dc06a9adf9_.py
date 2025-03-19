@@ -1,8 +1,8 @@
-"""Create todo db
+"""empty message
 
-Revision ID: 7286f0a26c67
+Revision ID: f0dc06a9adf9
 Revises: 
-Create Date: 2025-03-16 23:32:27.068950
+Create Date: 2025-03-20 02:30:11.766992
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7286f0a26c67'
+revision = 'f0dc06a9adf9'
 down_revision = None
 branch_labels = None
 depends_on = None

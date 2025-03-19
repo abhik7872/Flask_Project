@@ -2,9 +2,10 @@ from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from flask_jwt_extended import jwt_required, get_jwt_identity, JWTManager
 from model import db, ToDO
+import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://abhikchatterjee:ABHIK@localhost/dummy_db"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE", "postgresql://abhikchatterjee:ABHIK@localhost/dummy_db")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = "myjwtsecret"
 app.config['JWT_TOKEN_LOCATION'] = ['headers']
@@ -99,4 +100,4 @@ def delete_todo(id):
 
 
 if __name__ == '__main__':
-    app.run(port=5002, debug=True)
+    app.run(host='0.0.0.0', port=5002, debug=True)
