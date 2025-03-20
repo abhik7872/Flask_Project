@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from flask_migrate import Migrate
 from flask_jwt_extended import jwt_required, get_jwt_identity, JWTManager
 from model import db, ToDO
 import os
@@ -13,7 +12,8 @@ app.config["JWT_HEADER_NAME"] = "Authorization"
 app.config["JWT_HEADER_TYPE"] = "Bearer"
 
 db.init_app(app)
-migrate = Migrate(app, db)
+with app.app_context():
+    db.create_all()
 jwt = JWTManager(app)
 
 @app.route('/todo', methods=['GET'], endpoint="get_todo")

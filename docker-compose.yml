@@ -22,6 +22,7 @@ services:
 
   login-service:
     build: ./login_service
+    image: abhik1201/flask-project-login-service:latest
     container_name: login_service
     restart: always
     depends_on:
@@ -37,6 +38,7 @@ services:
 
   todo-service:
     build: ./todo_service
+    image: abhik1201/flask-project-todo-service:latest
     container_name: todo_service
     restart: always
     depends_on:
@@ -52,6 +54,7 @@ services:
 
   frontend-gateway:
     build: ./api_gateway
+    image: abhik1201/flask-project-frontend-gateway:latest
     container_name: api_gateway
     restart: always
     depends_on:

@@ -5,4 +5,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 ENV FLASK_APP=login.py
 EXPOSE 5001
-CMD ["sh", "-c", "flask db upgrade && python login.py"]
+CMD ["python", "login.py"]

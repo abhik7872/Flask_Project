@@ -1,6 +1,4 @@
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, create_access_token
 from model import db, User
 import os
@@ -11,7 +9,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = "myjwtsecret"
 
 db.init_app(app)
-migrate = Migrate(app, db)
+with app.app_context():
+    db.create_all()
 jwt = JWTManager(app)
 
 @app.route('/', methods=["GET"])

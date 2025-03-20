@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o k8s/
+    kompose.version: 1.35.0 (HEAD)
+  labels:
+    io.kompose.service: login-service
+  name: login-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: login-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -o k8s/
+        kompose.version: 1.35.0 (HEAD)
+      labels:
+        io.kompose.service: login-service
+    spec:
+      containers:
+        - env:
+            - name: DATABASE
+              value: postgresql://abhikchatterjee:ABHIK@postgres:5432/dummy_db
+            - name: LOGIN_MICROSERVICE
+              value: http://login-service:5001
+          image: abhik1201/flask-project-login-service:latest
+          imagePullPolicy: Always
+          name: login-service
+          ports:
+            - containerPort: 5001
+              protocol: TCP
+      restartPolicy: Always

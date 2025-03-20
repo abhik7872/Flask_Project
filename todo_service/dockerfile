@@ -5,4 +5,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 ENV FLASK_APP=todo.py
 EXPOSE 5002
-CMD ["sh", "-c", "flask db upgrade && python todo.py"]
+CMD ["python", "todo.py"]

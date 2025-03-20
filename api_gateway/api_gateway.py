@@ -4,7 +4,7 @@ import os
 from flask_jwt_extended import JWTManager
 
 
-LOGIN_MICROSERVICE = os.getenv("LOGIN_MICROSERVICE", "http://login_service:5001")
+LOGIN_MICROSERVICE = os.getenv("LOGIN_MICROSERVICE", "http://login-service:5001")
 TODO_MICROSERVICE = os.getenv("TODO_MICROSERVICE", "http://todo-service:5002")
 
 app = Flask(__name__)
@@ -45,7 +45,13 @@ def login():
 
             return redirect(next_url)
 
-        return "Login failed!", 401
+        elif response.status_code in [400, 401]:
+            flash("Unable to login, please check your credentials", "failure")
+            return redirect(url_for("login"))
+
+        else:
+            flash("An unexpected error occurred", "failure")
+            return redirect(url_for("login"))
 
 
 @app.route('/register', methods=['GET', 'POST'])
