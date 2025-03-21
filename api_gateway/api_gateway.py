@@ -26,27 +26,26 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        if not username or not password:
-            return "Missing form data!", 400
+        # if not username or not password:
+        #     return "Missing form data!", 400
         
         data = {"username": username, "password": password}
         headers = {"Content-Type": "application/json"}
 
         response = requests.post(f"{LOGIN_MICROSERVICE}/login", json=data, headers=headers)
+        json_response = response.json()
 
         print("Login Response Status Code:", response.status_code)
         print("Login Response Data:", response.text)
 
         if response.status_code == 200:
-            json_response = response.json()
             session["token"] = json_response.get("access_token", "")
-
             print("Stored Token:", session.get("token"))
 
             return redirect(next_url)
 
         elif response.status_code in [400, 401]:
-            flash("Unable to login, please check your credentials", "failure")
+            flash(jsonify(json_response).get_data(as_text=True), "failure")
             return redirect(url_for("login"))
 
         else:
@@ -64,7 +63,16 @@ def register():
 
         if response.status_code == 201:
             return redirect(url_for("login"))
-        return "Registration failed!", 400
+        
+        elif response.status_code in [400, 401]:
+            json_response = response.json()
+            flash(jsonify(json_response).get_data(as_text=True), "failure")
+            return redirect(url_for("register"))
+
+        else:
+            flash("An unexpected error occurred", "failure")
+            return redirect(url_for("register"))
+
 
 @app.route('/todo', methods=['GET', 'POST'])
 def todo_page():
